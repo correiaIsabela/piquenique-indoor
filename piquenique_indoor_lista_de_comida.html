@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piquenique Indoor • O que vais levar?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================
+           1. RESET E VARIÁVEIS DE DESIGN (MOBILE-FIRST)
+           ========================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-cream: #FDF8F2;
+            --bg-sand: #F5EBE0;
+            --border-sand: #E6D7C8;
+            --white: #FFFFFF;
+            --primary-red: #D94E41;
+            --primary-red-hover: #C23E32;
+            --primary-red-light: #FCEAE8;
+            --accent-green: #3A6B4C;
+            --accent-green-light: #E8F2EC;
+            --text-brown: #3D2C2E;
+            --text-muted: #7A686A;
+            --shadow-sm: 0 2px 8px rgba(61, 44, 46, 0.06);
+            --shadow-md: 0 8px 24px rgba(61, 44, 46, 0.08);
+            --shadow-lg: 0 16px 36px rgba(61, 44, 46, 0.16);
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 26px;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-brown);
+            background-color: var(--bg-cream);
+            background-image: 
+                linear-gradient(90deg, rgba(217, 78, 65, 0.055) 50%, transparent 50%),
+                linear-gradient(rgba(217, 78, 65, 0.055) 50%, transparent 50%);
+            background-size: 36px 36px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .font-serif {
+            font-family: 'Fraunces', Georgia, serif;
+        }
+
+        button, input {
+            font-family: inherit;
+        }
+
+        /* ==========================================
+           2. LAYOUT PRINCIPAL E CABEÇALHO
+           ========================================== */
+        .container {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .hero {
+            padding: 28px 16px 20px;
+            text-align: center;
+        }
+
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--white);
+            border: 1px solid var(--border-sand);
+            box-shadow: var(--shadow-sm);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary-red);
+            margin-bottom: 14px;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 1.8s infinite;
+        }
+
+        .sync-dot.connecting {
+            background: #E09F3E;
+        }
+
+        .sync-dot.error {
+            background: var(--primary-red);
+            animation: none;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.85rem, 5vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 10px;
+            color: var(--text-brown);
+        }
+
+        .hero p {
+            max-width: 520px;
+            margin: 0 auto;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* Barra de Resumo e Partilha */
+        .summary-bar {
+            margin: 20px auto 0;
+            max-width: 540px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--border-sand);
+            border-radius: var(--radius-lg);
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .summary-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .summary-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--accent-green-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .summary-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        .summary-count {
+            font-family: 'Fraunces', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-brown);
+        }
+
+        .btn-share {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: var(--bg-cream);
+            border: 1px solid var(--border-sand);
+            color: var(--text-brown);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-height: 42px;
+        }
+
+        .btn-share:hover {
+            background: var(--bg-sand);
+        }
+
+        .btn-share:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 460px) {
+            .btn-share {
+                width: 100%;
+            }
+        }
+
+        /* ==========================================
+           3. FORMULÁRIO E SELEÇÃO DE CATEGORIA (CHIPS)
+           ========================================== */
+        main {
+            flex: 1;
+            padding-bottom: 48px;
+        }
+
+        .form-card {
+            background: var(--white);
+            border: 1px solid var(--border-sand);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 28px;
+        }
+
+        @media (min-width: 640px) {
+            .form-card {
+                padding: 28px;
+            }
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .form-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--primary-red-light);
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .form-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .form-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .inputs-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        @media (min-width: 640px) {
+            .inputs-row {
+                grid-template-columns: 1fr 1.4fr;
+            }
+        }
+
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: var(--radius-md);
+            background: var(--bg-cream);
+            border: 1.5px solid var(--border-sand);
+            color: var(--text-brown);
+            font-size: 15px;
+            font-weight: 500;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .text-input::placeholder {
+            color: #A69597;
+        }
+
+        .text-input:focus {
+            outline: none;
+            background: var(--white);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(217, 78, 65, 0.15);
+        }
+
+        /* Chips Visuais de Seleção de Categoria */
+        .category-chips {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        @media (min-width: 640px) {
+            .category-chips {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 860px) {
+            .category-chips {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        .cat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 12px;
+            border-radius: var(--radius-md);
+            background: var(--bg-cream);
+            border: 2px solid var(--border-sand);
+            color: var(--text-brown);
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: 48px;
+            width: 100%;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cat-chip:hover {
+            background: var(--bg-sand);
+        }
+
+        .cat-chip.active {
+            background: var(--primary-red-light);
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+            box-shadow: 0 4px 12px rgba(217, 78, 65, 0.15);
+            font-weight: 700;
+        }
+
+        .cat-chip-emoji {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .cat-chip-text {
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            background: var(--primary-red);
+            color: var(--white);
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(217, 78, 65, 0.25);
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 50px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--primary-red-hover);
+        }
+
+        .btn-submit:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ==========================================
+           4. GRELHA DE CATEGORIAS E ITENS REGISTADOS
+           ========================================== */
+        .loading-box {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-sand);
+            border-top-color: var(--primary-red);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        @media (min-width: 640px) {
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 920px) {
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .cat-card {
+            background: var(--white);
+            border: 1px solid var(--border-sand);
+            border-radius: var(--radius-xl);
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .cat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .cat-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .cat-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .cat-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: var(--text-brown);
+        }
+
+        .count-badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .count-badge.empty {
+            background: var(--bg-cream);
+            color: var(--text-muted);
+            border: 1px solid var(--border-sand);
+        }
+
+        .count-badge.has-items {
+            background: var(--accent-green-light);
+            color: var(--accent-green);
+            border: 1px solid rgba(58, 107, 76, 0.2);
+        }
+
+        .empty-placeholder {
+            padding: 20px 12px;
+            text-align: center;
+            border-radius: var(--radius-md);
+            border: 1.5px dashed var(--border-sand);
+            background: rgba(253, 248, 242, 0.65);
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        .items-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item-row {
+            background: var(--bg-cream);
+            border: 1px solid var(--border-sand);
+            border-radius: var(--radius-md);
+            padding: 11px 12px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .item-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .item-guest {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-brown);
+            margin-bottom: 2px;
+        }
+
+        .item-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary-red);
+            flex-shrink: 0;
+        }
+
+        .item-desc {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-brown);
+            padding-left: 13px;
+            word-break: break-word;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .icon-btn:hover {
+            background: var(--white);
+            color: var(--text-brown);
+        }
+
+        .icon-btn.delete:hover {
+            background: var(--primary-red-light);
+            color: var(--primary-red);
+        }
+
+        .btn-quick-add {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: var(--bg-cream);
+            border: 1px solid var(--border-sand);
+            color: var(--text-brown);
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-quick-add:hover {
+            background: var(--bg-sand);
+        }
+
+        /* ==========================================
+           5. MODAIS E TOAST NOTIFICATIONS
+           ========================================== */
+        .toast-container {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            left: 16px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            width: 100%;
+            max-width: 380px;
+            padding: 13px 16px;
+            border-radius: var(--radius-md);
+            color: var(--white);
+            font-size: 13.5px;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: popIn 0.25s ease forwards;
+        }
+
+        .toast.success { background: var(--accent-green); }
+        .toast.error { background: var(--primary-red); }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(61, 44, 46, 0.55);
+            backdrop-filter: blur(3px);
+            z-index: 90;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--white);
+            border: 1px solid var(--border-sand);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 440px;
+            padding: 22px;
+            box-shadow: var(--shadow-lg);
+            animation: popIn 0.2s ease forwards;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--bg-sand);
+            border: none;
+            color: var(--text-brown);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary-modal {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--accent-green);
+            border: none;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-danger-modal {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--primary-red);
+            border: none;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Chips dentro do Modal de Edição */
+        .modal-chips {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        footer {
+            padding: 20px 16px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-sand);
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(0.85); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Notificações Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modal de Edição -->
+    <div id="edit-modal" class="modal-backdrop">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Editar o teu contributo</h3>
+                <button type="button" id="close-edit-modal" class="icon-btn" aria-label="Fechar">✕</button>
+            </div>
+            <form id="edit-form" style="display: flex; flex-direction: column; gap: 14px;">
+                <input type="hidden" id="edit-item-id">
+                <div>
+                    <label for="edit-name" class="field-label">O teu nome</label>
+                    <input type="text" id="edit-name" required maxlength="30" class="text-input">
+                </div>
+                <div>
+                    <span class="field-label">Categoria</span>
+                    <div id="edit-category-chips" class="modal-chips"></div>
+                </div>
+                <div>
+                    <label for="edit-item" class="field-label">O que vais levar?</label>
+                    <input type="text" id="edit-item" required maxlength="65" class="text-input">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-edit-btn" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary-modal">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Remoção -->
+    <div id="delete-modal" class="modal-backdrop">
+        <div class="modal-box" style="text-align: center;">
+            <div style="font-size: 32px; margin-bottom: 8px;">🧺</div>
+            <h3 style="margin-bottom: 6px;">Tirar da cesta?</h3>
+            <p id="delete-modal-text" style="font-size: 14px; color: var(--text-muted);">Tens a certeza que queres remover este item?</p>
+            <input type="hidden" id="delete-item-id">
+            <div class="modal-actions">
+                <button type="button" id="cancel-delete-btn" class="btn-secondary">Manter</button>
+                <button type="button" id="confirm-delete-btn" class="btn-danger-modal">Sim, remover</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabeçalho Hero -->
+    <header class="hero">
+        <div class="container">
+            <div class="sync-badge">
+                <span id="sync-dot" class="sync-dot connecting"></span>
+                <span id="sync-label">A ligar à cesta partilhada...</span>
+            </div>
+            <h1>Piquenique Indoor 🧺✨</h1>
+            <p>Vê o que os outros já vão levar para evitar coisas repetidas e adiciona o teu contributo à nossa cesta!</p>
+
+            <!-- Resumo + Botão Partilhar -->
+            <div class="summary-bar">
+                <div class="summary-info">
+                    <div class="summary-icon">🧺</div>
+                    <div>
+                        <span class="summary-label">Na nossa cesta</span>
+                        <span id="total-counter" class="summary-count">0 itens registados</span>
+                    </div>
+                </div>
+                <button type="button" id="copy-link-btn" class="btn-share">
+                    <span>🔗</span>
+                    <span id="copy-btn-text">Copiar link do piquenique</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+
+        <!-- Formulário para Adicionar Item -->
+        <section class="form-card">
+            <div class="form-header">
+                <div class="form-header-icon">➕</div>
+                <div>
+                    <h2>Adicionar à nossa cesta</h2>
+                    <p>Coisas simples e económicas — vê primeiro o que já está na lista abaixo!</p>
+                </div>
+            </div>
+
+            <form id="add-item-form" class="form-grid">
+                <!-- Passo 1: Escolher Categoria com Botões Táteis -->
+                <div>
+                    <span class="field-label">1. Escolhe a Categoria</span>
+                    <div id="category-chips" class="category-chips" role="radiogroup" aria-label="Categoria">
+                        <!-- Botões gerados imediatamente -->
+                    </div>
+                </div>
+
+                <!-- Passo 2: Nome e Comida/Bebida -->
+                <div class="inputs-row">
+                    <div>
+                        <label for="guest-name" class="field-label">2. O teu Nome</label>
+                        <input type="text" id="guest-name" required maxlength="30" placeholder="Ex: Joana" class="text-input">
+                    </div>
+                    <div>
+                        <label for="item-desc" class="field-label">3. O que vais levar?</label>
+                        <input type="text" id="item-desc" required maxlength="65" placeholder="Ex: Batatas fritas presunto" class="text-input">
+                    </div>
+                </div>
+
+                <!-- Botão Confirmar -->
+                <button type="submit" id="submit-btn" class="btn-submit">
+                    <span>🧺 Adicionar à cesta</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Estado de Carregamento -->
+        <div id="loading-state" class="loading-box">
+            <div class="spinner"></div>
+            <p>A abrir a toalha de piquenique e carregar a lista...</p>
+        </div>
+
+        <!-- Grelha de Categorias -->
+        <section id="categories-grid" class="categories-grid hidden">
+            <!-- Cartões renderizados via JS -->
+        </section>
+
+    </main>
+
+    <footer>
+        Dica: Dá uma vista de olhos ao que os outros já puseram para evitar sabores iguais (ex: 3 sumos de laranja iguais 😉).
+    </footer>
+
+    <!-- Script Principal (UI Imediata + Firebase Firestore em Tempo Real) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            addDoc, 
+            updateDoc, 
+            deleteDoc, 
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // 1. DADOS DAS CATEGORIAS (SEM VAGAS)
+        // ==========================================
+        const CATEGORIES = [
+            {
+                id: 'salgados_pacote',
+                name: 'Salgados de pacote',
+                emoji: '🥨',
+                placeholder: 'Ex: Batatas fritas, pipocas, frutos secos...',
+                iconBg: '#FEF3C7'
+            },
+            {
+                id: 'comida_sandes',
+                name: 'Comida / Sandes',
+                emoji: '🥪',
+                placeholder: 'Ex: Sandes, folhados, empadas, húmus, pizza...',
+                iconBg: '#FFEDD5'
+            },
+            {
+                id: 'fruta_fresco',
+                name: 'Fruta / Fresco',
+                emoji: '🍓',
+                placeholder: 'Ex: Uvas, morangos, melancia, tomate cherry...',
+                iconBg: '#D1FAE5'
+            },
+            {
+                id: 'doces',
+                name: 'Doces',
+                emoji: '🍪',
+                placeholder: 'Ex: Bolachas, brownies, gomas, bolo...',
+                iconBg: '#FFE4E6'
+            },
+            {
+                id: 'bebidas',
+                name: 'Bebidas',
+                emoji: '🥤',
+                placeholder: 'Ex: Sumos, refrigerantes, iced tea, água...',
+                iconBg: '#E0F2FE'
+            }
+        ];
+
+        // Estado da aplicação
+        let selectedCategoryId = CATEGORIES[0].id;
+        let editSelectedCategoryId = CATEGORIES[0].id;
+        let picnicItems = [];
+        let db = null;
+        let currentUser = null;
+        let isFirebaseReady = false;
+
+        // Referências DOM
+        const categoryChipsContainer = document.getElementById('category-chips');
+        const editCategoryChipsContainer = document.getElementById('edit-category-chips');
+        const guestNameInput = document.getElementById('guest-name');
+        const itemDescInput = document.getElementById('item-desc');
+        const addItemForm = document.getElementById('add-item-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const loadingState = document.getElementById('loading-state');
+        const categoriesGrid = document.getElementById('categories-grid');
+        const totalCounter = document.getElementById('total-counter');
+        const syncDot = document.getElementById('sync-dot');
+        const syncLabel = document.getElementById('sync-label');
+
+        // ==========================================
+        // 2. RENDERIZAÇÃO IMEDIATA DOS BOTÕES DE CATEGORIA
+        // ==========================================
+        function renderCategoryChips() {
+            categoryChipsContainer.innerHTML = '';
+            CATEGORIES.forEach(cat => {
+                const isActive = cat.id === selectedCategoryId;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `cat-chip ${isActive ? 'active' : ''}`;
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                btn.innerHTML = `
+                    <span class="cat-chip-emoji">${cat.emoji}</span>
+                    <span class="cat-chip-text">${cat.name}</span>
+                `;
+                btn.addEventListener('click', () => {
+                    selectedCategoryId = cat.id;
+                    itemDescInput.placeholder = cat.placeholder;
+                    renderCategoryChips();
+                });
+                categoryChipsContainer.appendChild(btn);
+            });
+        }
+
+        function renderEditCategoryChips() {
+            editCategoryChipsContainer.innerHTML = '';
+            CATEGORIES.forEach(cat => {
+                const isActive = cat.id === editSelectedCategoryId;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `cat-chip ${isActive ? 'active' : ''}`;
+                btn.innerHTML = `
+                    <span class="cat-chip-emoji">${cat.emoji}</span>
+                    <span class="cat-chip-text">${cat.name}</span>
+                `;
+                btn.addEventListener('click', () => {
+                    editSelectedCategoryId = cat.id;
+                    renderEditCategoryChips();
+                });
+                editCategoryChipsContainer.appendChild(btn);
+            });
+        }
+
+        // Renderizar já os botões antes mesmo do Firebase ligar
+        renderCategoryChips();
+
+        // ==========================================
+        // 3. UTILITÁRIOS (TOAST E SEGURANÇA HTML)
+        // ==========================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'error' ? '⚠️' : '🧺';
+            toast.innerHTML = `<span>${icon}</span><span>${escapeHTML(message)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-6px)';
+                toast.style.transition = 'all 0.2s ease';
+                setTimeout(() => toast.remove(), 220);
+            }, 3400);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // ==========================================
+        // 4. RENDERIZAÇÃO DA LISTA POR CATEGORIAS
+        // ==========================================
+        function renderBoard() {
+            const total = picnicItems.length;
+            totalCounter.textContent = total === 1 ? '1 item registado' : `${total} itens registados`;
+
+            categoriesGrid.innerHTML = '';
+
+            CATEGORIES.forEach(cat => {
+                const itemsInCat = picnicItems
+                    .filter(item => item.category === cat.id)
+                    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+                const count = itemsInCat.length;
+                const badgeClass = count === 0 ? 'empty' : 'has-items';
+                const badgeText = count === 0 ? '0 itens' : count === 1 ? '1 item' : `${count} itens`;
+
+                const card = document.createElement('div');
+                card.className = 'cat-card';
+
+                let listHTML = '';
+                if (count === 0) {
+                    listHTML = `
+                        <div class="empty-placeholder">
+                            Ainda ninguém escolheu esta categoria.<br>Sê o primeiro!
+                        </div>
+                    `;
+                } else {
+                    listHTML = `<ul class="items-list">`;
+                    itemsInCat.forEach(entry => {
+                        listHTML += `
+                            <li class="item-row">
+                                <div class="item-info">
+                                    <div class="item-guest">
+                                        <span class="item-dot"></span>
+                                        <span>${escapeHTML(entry.name)}</span>
+                                    </div>
+                                    <div class="item-desc">${escapeHTML(entry.item)}</div>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" class="icon-btn" data-action="edit" data-id="${entry.id}" title="Editar">✏️</button>
+                                    <button type="button" class="icon-btn delete" data-action="delete" data-id="${entry.id}" title="Apagar">🗑️</button>
+                                </div>
+                            </li>
+                        `;
+                    });
+                    listHTML += `</ul>`;
+                }
+
+                card.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div class="cat-card-header">
+                            <div class="cat-title-wrap">
+                                <div class="cat-icon-box" style="background: ${cat.iconBg};">${cat.emoji}</div>
+                                <h3 class="cat-card-title">${cat.name}</h3>
+                            </div>
+                            <span class="count-badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                        ${listHTML}
+                    </div>
+                    <button type="button" class="btn-quick-add" data-quick-cat="${cat.id}">
+                        + Adicionar a ${cat.name}
+                    </button>
+                `;
+
+                categoriesGrid.appendChild(card);
+            });
+
+            loadingState.classList.add('hidden');
+            categoriesGrid.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 5. SUBMISSÃO DO FORMULÁRIO E AÇÕES
+        // ==========================================
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'piquenique-indoor-app';
+
+        function getItemsCollection() {
+            return collection(db, 'artifacts', appId, 'public', 'data', 'picnic_items');
+        }
+
+        function getItemDoc(id) {
+            return doc(db, 'artifacts', appId, 'public', 'data', 'picnic_items', id);
+        }
+
+        addItemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = guestNameInput.value.trim();
+            const item = itemDescInput.value.trim();
+            const category = selectedCategoryId;
+
+            if (!name || !item) return;
+
+            if (!isFirebaseReady || !db || !currentUser) {
+                showToast('A ligação à cesta ainda está a iniciar. Tenta dentro de 2 segundos!', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            const prevHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span>A guardar na cesta...</span>';
+
+            try {
+                await addDoc(getItemsCollection(), {
+                    name,
+                    category,
+                    item,
+                    createdAt: Date.now(),
+                    createdBy: currentUser.uid
+                });
+
+                itemDescInput.value = '';
+                showToast(`Boa, ${name}! "${item}" adicionado à cesta.`);
+            } catch (err) {
+                console.error('Erro ao adicionar:', err);
+                showToast('Erro ao guardar o item. Verifica a ligação e tenta de novo.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = prevHTML;
+            }
+        });
+
+        // Cliques nos cartões (Adicionar rápido, Editar, Apagar)
+        categoriesGrid.addEventListener('click', (e) => {
+            const quickBtn = e.target.closest('[data-quick-cat]');
+            if (quickBtn) {
+                const catId = quickBtn.getAttribute('data-quick-cat');
+                selectedCategoryId = catId;
+                const catObj = CATEGORIES.find(c => c.id === catId);
+                if (catObj) itemDescInput.placeholder = catObj.placeholder;
+                renderCategoryChips();
+                addItemForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                guestNameInput.focus();
+                return;
+            }
+
+            const actionBtn = e.target.closest('[data-action]');
+            if (!actionBtn) return;
+
+            const action = actionBtn.getAttribute('data-action');
+            const id = actionBtn.getAttribute('data-id');
+            const target = picnicItems.find(i => i.id === id);
+            if (!target) return;
+
+            if (action === 'edit') {
+                document.getElementById('edit-item-id').value = target.id;
+                document.getElementById('edit-name').value = target.name;
+                document.getElementById('edit-item').value = target.item;
+                editSelectedCategoryId = target.category;
+                renderEditCategoryChips();
+                document.getElementById('edit-modal').classList.add('open');
+            } else if (action === 'delete') {
+                document.getElementById('delete-item-id').value = target.id;
+                document.getElementById('delete-modal-text').textContent = `Queres remover "${target.item}" (${target.name}) da lista?`;
+                document.getElementById('delete-modal').classList.add('open');
+            }
+        });
+
+        // Modais: Fechar, Editar e Apagar
+        const editModal = document.getElementById('edit-modal');
+        const deleteModal = document.getElementById('delete-modal');
+
+        document.getElementById('close-edit-modal').addEventListener('click', () => editModal.classList.remove('open'));
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => editModal.classList.remove('open'));
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => deleteModal.classList.remove('open'));
+
+        editModal.addEventListener('click', (e) => { if (e.target === editModal) editModal.classList.remove('open'); });
+        deleteModal.addEventListener('click', (e) => { if (e.target === deleteModal) deleteModal.classList.remove('open'); });
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isFirebaseReady || !db || !currentUser) return;
+
+            const id = document.getElementById('edit-item-id').value;
+            const newName = document.getElementById('edit-name').value.trim();
+            const newItem = document.getElementById('edit-item').value.trim();
+
+            if (!id || !newName || !newItem) return;
+
+            editModal.classList.remove('open');
+            try {
+                await updateDoc(getItemDoc(id), {
+                    name: newName,
+                    category: editSelectedCategoryId,
+                    item: newItem
+                });
+                showToast('Alterações guardadas!');
+            } catch (err) {
+                console.error('Erro ao editar:', err);
+                showToast('Não foi possível editar o item.', 'error');
+            }
+        });
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!isFirebaseReady || !db || !currentUser) return;
+
+            const id = document.getElementById('delete-item-id').value;
+            if (!id) return;
+
+            deleteModal.classList.remove('open');
+            try {
+                await deleteDoc(getItemDoc(id));
+                showToast('Item removido da cesta.');
+            } catch (err) {
+                console.error('Erro ao remover:', err);
+                showToast('Não foi possível remover o item.', 'error');
+            }
+        });
+
+        // Copiar Link
+        document.getElementById('copy-link-btn').addEventListener('click', () => {
+            const url = window.location.href;
+            const temp = document.createElement('input');
+            temp.value = url;
+            document.body.appendChild(temp);
+            temp.select();
+            try {
+                document.execCommand('copy');
+                const btnText = document.getElementById('copy-btn-text');
+                btnText.textContent = 'Link copiado!';
+                showToast('Link copiado! Cola agora no grupo do WhatsApp.');
+                setTimeout(() => { btnText.textContent = 'Copiar link do piquenique'; }, 2500);
+            } catch (err) {
+                showToast('Copia o link do navegador para partilhar!', 'error');
+            }
+            document.body.removeChild(temp);
+        });
+
+        // ==========================================
+        // 6. LIGAÇÃO AO FIREBASE FIRESTORE
+        // ==========================================
+        async function initFirebase() {
+            const firebaseConfig = typeof __firebase_config !== 'undefined' 
+                ? JSON.parse(__firebase_config) 
+                : null;
+
+            if (!firebaseConfig) {
+                syncDot.className = 'sync-dot error';
+                syncLabel.textContent = 'Configuração em falta';
+                renderBoard();
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const cred = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = cred.user;
+                } else {
+                    const cred = await signInAnonymously(auth);
+                    currentUser = cred.user;
+                }
+
+                isFirebaseReady = true;
+                syncDot.className = 'sync-dot';
+                syncLabel.textContent = 'Lista partilhada em tempo real';
+
+                onSnapshot(
+                    getItemsCollection(),
+                    (snapshot) => {
+                        const list = [];
+                        snapshot.forEach((docSnap) => {
+                            list.push({ id: docSnap.id, ...docSnap.data() });
+                        });
+                        picnicItems = list;
+                        renderBoard();
+                    },
+                    (error) => {
+                        console.error('Erro Firestore:', error);
+                        syncDot.className = 'sync-dot error';
+                        syncLabel.textContent = 'Erro de sincronização';
+                        showToast('Não foi possível sincronizar a lista.', 'error');
+                    }
+                );
+            } catch (err) {
+                console.error('Erro inicialização Firebase:', err);
+                syncDot.className = 'sync-dot error';
+                syncLabel.textContent = 'Sem ligação ao servidor';
+                renderBoard();
+                showToast('Erro ao ligar à base de dados.', 'error');
+            }
+        }
+
+        initFirebase();
+    </script>
+</body>
+</html>
