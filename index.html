@@ -655,13 +655,16 @@
       { id: 'bebidas', name: 'Bebidas', emoji: '🥤', bg: '#e0f2fe' }
     ];
 
-    const API_BASE = 'https://jsonblob.com/api/jsonBlob';
-    let blobId = null;
+    const DB_ENDPOINTS = [
+      'https://piquenique-indoor-default-rtdb.firebaseio.com/cesta.json',
+      'https://piquenique-indoor-default-rtdb.europe-west1.firebasedatabase.app/cesta.json'
+    ];
+    let activeEndpoint = DB_ENDPOINTS[0];
+
     let items = [];
     let selectedCategory = 'salgados';
     let editingId = null;
     let isSyncing = false;
-    let offlineMode = false;
 
     const statusPill = document.getElementById('status-pill');
     const statusText = document.getElementById('status-text');
@@ -798,119 +801,64 @@
         showToast('Preenche o nome e o item!', true);
         return;
       }
-      items = items.map(item => item.id === id ? { ...item, name: newName, food: newFood } : item);
-      editingId = null;
-      renderBoard();
-      await saveToCloud();
-      showToast('Item atualizado!');
+      isSyncing = true;
+      try {
+        await fetchFromFirebase();
+        items = items.map(item => item.id === id ? { ...item, name: newName, food: newFood } : item);
+        editingId = null;
+        renderBoard();
+        await saveToFirebase();
+        showToast('Item atualizado!');
+      } finally {
+        isSyncing = false;
+      }
     };
 
     window.removeItem = async function(id) {
-      items = items.filter(item => item.id !== id);
-      if (editingId === id) editingId = null;
-      renderBoard();
-      await saveToCloud();
-      showToast('Item removido da cesta.');
-    };
-
-    function saveLocalBackup() {
-      try {
-        localStorage.setItem('piquenique_backup_' + (blobId || 'local'), JSON.stringify(items));
-      } catch (e) {}
-    }
-
-    function loadLocalBackup() {
-      try {
-        const saved = localStorage.getItem('piquenique_backup_' + (blobId || 'local'));
-        if (saved) items = JSON.parse(saved);
-      } catch (e) {}
-    }
-
-    async function initCloud() {
-      const params = new URLSearchParams(window.location.search);
-      blobId = params.get('id');
-
-      if (!blobId) {
-        try {
-          const res = await fetch(API_BASE, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({ items: [] })
-          });
-          if (!res.ok) throw new Error('Falha ao criar lista');
-          const locationHeader = res.headers.get('Location') || res.headers.get('X-jsonblob');
-          if (locationHeader) {
-            blobId = locationHeader.split('/').pop();
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('id', blobId);
-            window.history.replaceState({}, '', newUrl.toString());
-            offlineMode = false;
-            setStatus('online', 'Cesta partilhada ativa');
-          } else {
-            throw new Error('Sem ID');
-          }
-        } catch (err) {
-          offlineMode = true;
-          setStatus('offline', 'Modo local (sem ligação externa)');
-          loadLocalBackup();
-        }
-      } else {
-        await fetchFromCloud();
-      }
-
-      renderBoard();
-      setInterval(() => {
-        if (!editingId && !isSyncing && !offlineMode && blobId) {
-          fetchFromCloud();
-        }
-      }, 3000);
-    }
-
-    async function fetchFromCloud() {
-      if (!blobId) return;
-      try {
-        const res = await fetch(`${API_BASE}/${blobId}`, {
-          headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error('Erro ao ler');
-        const data = await res.json();
-        if (Array.isArray(data.items)) {
-          const changed = JSON.stringify(data.items) !== JSON.stringify(items);
-          items = data.items;
-          saveLocalBackup();
-          if (changed && !editingId) renderBoard();
-        }
-        offlineMode = false;
-        setStatus('online', 'Cesta partilhada ativa');
-      } catch (err) {
-        if (items.length === 0) loadLocalBackup();
-        setStatus('offline', 'A tentar reconectar...');
-      }
-    }
-
-    async function saveToCloud() {
-      saveLocalBackup();
-      if (!blobId) return;
       isSyncing = true;
       try {
-        const res = await fetch(`${API_BASE}/${blobId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ items })
-        });
-        if (!res.ok) throw new Error('Erro ao gravar');
-        offlineMode = false;
-        setStatus('online', 'Cesta partilhada ativa');
-      } catch (err) {
-        showToast('Erro de rede — guardado localmente.', true);
+        await fetchFromFirebase();
+        items = items.filter(item => item.id !== id);
+        if (editingId === id) editingId = null;
+        renderBoard();
+        await saveToFirebase();
+        showToast('Item removido da cesta.');
       } finally {
         isSyncing = false;
+      }
+    };
+
+    async function fetchFromFirebase() {
+      for (const url of [activeEndpoint, ...DB_ENDPOINTS.filter(u => u !== activeEndpoint)]) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          activeEndpoint = url;
+          const data = await res.json();
+          const list = Array.isArray(data) ? data.filter(Boolean) : (data ? Object.values(data) : []);
+          const changed = JSON.stringify(list) !== JSON.stringify(items);
+          items = list;
+          if (changed && !editingId) renderBoard();
+          setStatus('online', 'Cesta partilhada ativa');
+          return true;
+        } catch (err) {}
+      }
+      setStatus('offline', 'Erro de ligação ao Firebase');
+      return false;
+    }
+
+    async function saveToFirebase() {
+      try {
+        const res = await fetch(activeEndpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(items)
+        });
+        if (!res.ok) throw new Error('Falha ao gravar');
+        setStatus('online', 'Cesta partilhada ativa');
+      } catch (err) {
+        setStatus('offline', 'Sem permissão de escrita');
+        showToast('Erro ao guardar — verifica se o modo de teste está ativo no Firebase.', true);
       }
     }
 
@@ -922,11 +870,10 @@
 
       submitBtn.disabled = true;
       submitText.textContent = 'A guardar...';
+      isSyncing = true;
 
       try {
-        if (blobId && !offlineMode) {
-          await fetchFromCloud();
-        }
+        await fetchFromFirebase();
         items.push({
           id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
           category: selectedCategory,
@@ -935,22 +882,23 @@
         });
         foodInput.value = '';
         renderBoard();
-        await saveToCloud();
+        await saveToFirebase();
         showToast('Adicionado à cesta! 🧺');
       } finally {
+        isSyncing = false;
         submitBtn.disabled = false;
         submitText.textContent = 'Adicionar à cesta';
       }
     });
 
     shareBtn.addEventListener('click', async () => {
-      const url = window.location.href;
+      const cleanUrl = window.location.origin + window.location.pathname;
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(cleanUrl);
         showToast('Link copiado! Cola no grupo do WhatsApp.');
       } catch (err) {
         const temp = document.createElement('input');
-        temp.value = url;
+        temp.value = cleanUrl;
         document.body.appendChild(temp);
         temp.select();
         document.execCommand('copy');
@@ -961,7 +909,12 @@
 
     renderCategoryButtons();
     renderBoard();
-    initCloud();
+    fetchFromFirebase();
+    setInterval(() => {
+      if (!editingId && !isSyncing) {
+        fetchFromFirebase();
+      }
+    }, 3000);
   </script>
 </body>
 </html>
